@@ -5,7 +5,7 @@ from supabase import create_client
 # --- CLOUD SETTINGS ---
 # Note: Agar 401 error aaye to Supabase dashboard se "anon public" key dubara check karen.
 URL = "https://maadjojvbpewengqojpp.supabase.co" 
-KEY = "sb_publishable_clmdak087QAnyOP0Irny0g_jeFwkLYt" "sb_publishable_clmdaKO87QAnyOP0IrnY0g_jEfwkLYt"
+KEY = "sb_publishable_clmdaKO87QAnyOP0IrnY0g_jEfwkLYt"
 
 try:
     supabase = create_client(URL, KEY)
@@ -53,4 +53,5 @@ def add_new_user(username, password, shop_name):
         return False, "❌ Username already exists!"
     finally:
         conn.close()
+
 
