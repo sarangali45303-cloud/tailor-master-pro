@@ -13,7 +13,7 @@ def add_order_ui():
         </style>
     """, unsafe_allow_html=True)
 
-    st.markdown('<div class="main-header">🧵 ----- Master Measurement Chart</div>', unsafe_allow_html=True)
+    st.markdown('<div class="main-header">🧵 () Master Measurement Chart</div>', unsafe_allow_html=True)
 
     # ---------------- HEADER INFO ----------------
     with st.container():
@@ -149,4 +149,5 @@ def add_order_ui():
             except Exception as e:
 
                 st.error(f"❌ Database Error: {e}")
+
 
