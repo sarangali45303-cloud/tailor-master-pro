@@ -49,3 +49,35 @@ def user_profile_ui():
     if st.sidebar.button("🚪 Logout", use_container_width=True):
         st.session_state.logged_in = False
         st.rerun()
+import streamlit as st
+from database import verify_login, add_new_user
+from PIL import Image
+
+def user_profile_ui():
+    st.sidebar.markdown("---")
+    
+    # 1. PROFILE PIC UPLOAD LOGIC
+    # Check if pic is already in session
+    if "profile_pic" not in st.session_state:
+        st.session_state.profile_pic = "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+
+    # File Uploader for Picture
+    uploaded_file = st.sidebar.file_uploader("🖼️ Upload Photo", type=["jpg", "png", "jpeg"], key="prof_pic_uploader")
+    
+    if uploaded_file is not None:
+        # Save to session state
+        st.session_state.profile_pic = uploaded_file
+
+    # Display Picture
+    st.sidebar.image(st.session_state.profile_pic, width=100)
+    
+    # 2. USER INFO
+    st.sidebar.write(f"👤 **User:** {st.session_state.username}")
+    st.sidebar.write(f"🏪 **Shop:** {st.session_state.shop_name}")
+    
+    # Logout Button
+    if st.sidebar.button("🚪 Logout", use_container_width=True):
+        st.session_state.logged_in = False
+        st.rerun()
+
+# Baki login_system() wala code niche wese hi rahega...
