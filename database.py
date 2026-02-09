@@ -48,3 +48,4 @@ def add_new_user(username, password, shop_name):
         return False, "❌ Username already exists!"
     finally:
         conn.close()
+
