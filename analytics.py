@@ -21,7 +21,7 @@ def show_dashboard_stats():
             
     except Exception as e:
         if "401" in str(e):
-            st.error("🔑 API Key Error: Please check your Supabase 'anon' key in database.py")
+            st.error("sb_publishable_clmdaKO87QAnyOP0IrnY0g_jEfwkLYt")
         else:
             st.info("ℹ️ Database connection established. Waiting for first order data...")
 
@@ -52,3 +52,4 @@ def show_accounts_summary():
             st.info("No financial data available.")
     except:
         st.error("Could not load accounts.")
+
