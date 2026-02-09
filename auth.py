@@ -51,7 +51,7 @@ def login_system():
             if st.button("Get Password"):
                 st.warning("Password SMS service abhi activate nahi hui.")
                 import streamlit as st
-from modules.database import verify_login, add_new_user
+from database import verify_login, add_new_user
 from PIL import Image
 
 def login_system():
@@ -106,3 +106,4 @@ def user_profile_ui():
         st.session_state.logged_in = False
 
         st.rerun()
+
