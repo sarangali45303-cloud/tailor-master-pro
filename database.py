@@ -49,3 +49,4 @@ def add_new_user(username, password, shop_name):
     finally:
         conn.close()
 
+
