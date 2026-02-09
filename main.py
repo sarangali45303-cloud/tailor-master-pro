@@ -1,9 +1,9 @@
 import streamlit as st
-from modules.database import init_db
-from modules.orders import add_order_ui
-from modules.ui_styles import apply_custom_ui
-from modules.analytics import show_dashboard_stats
-from modules.auth import login_system, user_profile_ui
+from database import init_db
+from orders import add_order_ui
+from ui_styles import apply_custom_ui
+from analytics import show_dashboard_stats
+from auth import login_system, user_profile_ui
 
 # 1. Page Configuration (Mobile Friendly & Professional)
 st.set_page_config(
@@ -76,4 +76,5 @@ else:
 
 # 6. Sidebar Footer (Separated correctly to avoid SyntaxError)
 st.sidebar.markdown("---")
+
 st.sidebar.caption("Tailor Master Pro v1.0 | Powered by Supabase Cloud")
