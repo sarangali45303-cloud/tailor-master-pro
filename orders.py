@@ -13,7 +13,8 @@ def add_order_ui():
         </style>
     """, unsafe_allow_html=True)
 
-    st.markdown('<div class="main-header">🧵 () Master Measurement Chart</div>', unsafe_allow_html=True)
+    shop_name = st.session_state.get("shop_name", "Tailor Master") # Agar naam na mile toh 'Tailor Master' dikhaye
+st.markdown(f'<div class="main-header">🧵 {shop_name} - Master Measurement Chart</div>', unsafe_allow_html=True)e)
 
     # ---------------- HEADER INFO ----------------
     with st.container():
@@ -149,5 +150,6 @@ def add_order_ui():
             except Exception as e:
 
                 st.error(f"❌ Database Error: {e}")
+
 
 
