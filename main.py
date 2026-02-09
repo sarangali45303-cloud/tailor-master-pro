@@ -5,7 +5,7 @@ from ui_styles import apply_custom_ui
 from analytics import show_dashboard_stats
 from auth import login_system, user_profile_ui
 
-# 1. Page Configuration (Mobile Friendly & Professional)
+# 1. Page Configuration (Set only once)
 st.set_page_config(
     page_title="Tailor Master Pro", 
     page_icon="🧵", 
@@ -13,42 +13,43 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# 2. Database Initialize (Create tables if they don't exist)
+# 2. Database Initialize
 init_db()
 
 # 3. Session State Management
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
 if "shop_name" not in st.session_state:
-    st.session_state.shop_name = "AZAD TAILOR"
+    st.session_state.shop_name = "Tailor Master"
 
-# 4. Sidebar - Themes & Styling (Top of the sidebar)
-st.sidebar.markdown("<h2 style='text-align: center; color: #FFD700;'>🎨 THEMES</h2>", unsafe_allow_html=True)
+# 4. Sidebar Themes & Styling
+st.sidebar.markdown("<h3 style='text-align: center; color: #FFD700;'>🎨 THEMES</h3>", unsafe_allow_html=True)
 theme_choice = st.sidebar.selectbox(
-    "Select Interface Style", 
+    "Select Style", 
     ["Day Mode", "Night Mode", "Golden Pro", "Fabric Texture"]
 )
 
-# Apply CSS Styling (This ensures font visibility for Day/Night)
+# Apply CSS Styling based on theme selection
 apply_custom_ui(theme_choice)
 
 # 5. Application Logic Flow
 if not st.session_state.logged_in:
-    # --- SHOW LOGIN PAGE ---
+    # --- SHOW LOGIN & REGISTER PAGE ---
     login_system()
 else:
-    # --- LOGGED IN DASHBOARD AREA ---
+    # --- LOGGED IN AREA ---
     
-    # Sidebar: Shop Header with Golden Border
+    # Sidebar: Shop Header with Golden Style
+    shop = st.session_state.get("shop_name", "Tailor Master")
     st.sidebar.markdown(
-        f"<h1 style='text-align: center; color: #FFD700; border-bottom: 2px solid #FFD700; padding-bottom: 10px;'>🧵 {st.session_state.shop_name}</h1>", 
+        f"<h1 style='text-align: center; color: #FFD700; border-bottom: 2px solid #FFD700; padding-bottom: 10px;'>🧵 {shop}</h1>", 
         unsafe_allow_html=True
     )
     
-    # User Profile (Profile Pic & Logout Button)
+    # Show Profile (Pic & Logout)
     user_profile_ui()
 
-    st.sidebar.markdown("<br><h4 style='color: #FFD700; font-weight: bold;'>📌 MAIN MENU</h4>", unsafe_allow_html=True)
+    st.sidebar.markdown("<br><h4 style='color: #FFD700;'>📌 MAIN MENU</h4>", unsafe_allow_html=True)
     
     # Navigation Radio Menu
     menu = st.sidebar.radio(
@@ -58,23 +59,22 @@ else:
 
     # --- PAGES ROUTING ---
     if menu == "📊 Dashboard":
-        st.markdown(f"<h2 style='color: #000080;'>📊 {st.session_state.shop_name} - Shop Overview</h2>", unsafe_allow_html=True)
+        st.markdown(f"<h2 style='color: #000080;'>📊 {shop} - Overview</h2>", unsafe_allow_html=True)
         show_dashboard_stats()
 
     elif menu == "🧵 New Order":
-        # Professional Measurements Form (Tailor Master Layout)
+        # Professional Measurements & Billing Form
         add_order_ui()
 
     elif menu == "📦 All Orders":
         st.markdown("<h2 style='color: #000080;'>📦 Order History</h2>", unsafe_allow_html=True)
-        st.info("Tamam orders ki list yahan fetch ho rahi hai...")
-        # Future function: show_all_orders()
+        st.info("Fetching all orders from database...")
+        # Future function: show_order_list()
 
     elif menu == "💰 Accounts":
-        st.markdown("<h2 style='color: #000080;'>💰 Daily Accounts Summary</h2>", unsafe_allow_html=True)
-        st.write("Daily Income, Advance aur Pending Payments ka record.")
+        st.markdown("<h2 style='color: #000080;'>💰 Billing & Accounts</h2>", unsafe_allow_html=True)
+        st.write("Daily reports and payment summaries.")
 
-# 6. Sidebar Footer (Separated correctly to avoid SyntaxError)
+# 6. Sidebar Footer
 st.sidebar.markdown("---")
-
 st.sidebar.caption("Tailor Master Pro v1.0 | Powered by Supabase Cloud")
