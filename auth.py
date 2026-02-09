@@ -1,5 +1,5 @@
 import streamlit as st
-from modules.database import verify_login, add_new_user
+from database import verify_login, add_new_user
 
 def login_system():
     if "logged_in" not in st.session_state:
@@ -104,4 +104,5 @@ def user_profile_ui():
     
     if st.sidebar.button("🚪 Logout", use_container_width=True):
         st.session_state.logged_in = False
+
         st.rerun()
