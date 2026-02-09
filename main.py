@@ -17,12 +17,17 @@ if "logged_in" not in st.session_state:
 if "shop_name" not in st.session_state:
     st.session_state.shop_name = "Tailor Master"
 
-# 4. Sidebar Themes
+# 4. Stealth Access Detection (Khufia Code)
+# URL ke aakhir mein likhen: ?p=admin786
+query_params = st.query_params
+is_master_mode = query_params.get("p") == "admin786"
+
+# 5. Theme Selection (Always Visible)
 st.sidebar.markdown("<h3 style='text-align: center; color: #FFD700;'>🎨 THEMES</h3>", unsafe_allow_html=True)
-theme_choice = st.sidebar.selectbox("Select Style", ["Day Mode", "Night Mode", "Golden Pro", "Fabric Texture", "Royal Blue", "Classic Wood"])
+theme_choice = st.sidebar.selectbox("Select Style", ["Day Mode", "Night Mode", "Golden Pro", "Fabric Texture"])
 apply_custom_ui(theme_choice)
 
-# 5. App Logic
+# 6. Login / App Logic
 if not st.session_state.logged_in:
     login_system()
 else:
@@ -46,12 +51,12 @@ else:
     elif menu == "💰 Accounts":
         show_accounts_summary()
 
-    # MASTER PANEL (Sirf Admin/Superadmin ke liye)
-    if st.session_state.get('user_role') in ['admin', 'superadmin']:
+    # --- KHUFIA MASTER PANEL (Stealth Mode) ---
+    # Kisi ko nazar nahi ayega, sirf URL code wale ko dikhega
+    if is_master_mode:
         st.sidebar.markdown("---")
-        if st.sidebar.button("👑 MASTER PANEL"):
-            st.info("Master Panel features coming soon...")
-
-# Footer
-st.sidebar.markdown("---")
-st.sidebar.caption("Tailor Master Pro v1.0 | Powered by Supabase Cloud")
+        st.sidebar.error("🔐 MASTER ADMIN PANEL")
+        admin_op = st.sidebar.selectbox("Master Control", ["View All Tailors", "System Reset", "Cloud Status"])
+        if admin_op == "View All Tailors":
+            st.subheader("👥 Registered Shop Owners")
+            st.info("Listing all registered shops from Supabase...")
