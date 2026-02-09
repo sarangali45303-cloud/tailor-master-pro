@@ -2,7 +2,7 @@ import streamlit as st
 import json
 import uuid
 from datetime import date
-from modules.database import get_connection
+from database import get_connection
 
 def add_order_ui():
     # CSS for making it look more like a professional form
@@ -147,4 +147,5 @@ def add_order_ui():
                 st.balloons()
                 st.success(f"✅ Order AT-{order_no} Saved Locally & Ready to Sync!")
             except Exception as e:
+
                 st.error(f"❌ Database Error: {e}")
