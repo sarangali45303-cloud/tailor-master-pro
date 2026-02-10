@@ -1,7 +1,7 @@
 import streamlit as st
-from database import init_db
-from orders import add_order_ui
-from styling import apply_styling
+from modules.database import init_db
+from modules.orders import add_order_ui
+from modules.styling import apply_styling
 
 # ---------------- SYSTEM INIT ----------------
 init_db()
@@ -18,4 +18,3 @@ menu = st.sidebar.selectbox(
 # ---------------- PAGES ----------------
 if menu == "🧵 New Order":
     add_order_ui()
-

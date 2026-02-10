@@ -1,87 +1,40 @@
 import streamlit as st
 
-def apply_custom_ui(theme_choice, wallpaper_url=None):
-    # --- 1. THEME PALETTE ---
+def apply_custom_ui(theme_choice):
+    # --- NATURAL THEMES PALETTE ---
     palettes = {
-        "Day Mode": {"bg": "#F0F2F6", "sidebar": "#F8F9FA", "text": "#333333", "accent": "#007BFF"},
-        "Night Mode": {"bg": "#121212", "sidebar": "#1E1E1E", "text": "#E0E0E0", "accent": "#FFD700"},
-        "Golden Pro": {"bg": "#1C1C1C", "sidebar": "#262626", "text": "#FFD700", "accent": "#FFD700"},
+        "Natural Linen (Sada)": {"bg": "#F5F5DC", "side": "#E8E4C9", "txt": "#4E342E", "img": "https://www.transparenttextures.com/patterns/linen.png"},
+        "Dark Denim (Night)": {"bg": "#1A1A1D", "side": "#252839", "txt": "#C5C6C7", "img": "https://www.transparenttextures.com/patterns/denim.png"},
+        "Royal Silk (Golden)": {"bg": "#1C1C1C", "side": "#000000", "txt": "#FFD700", "img": "https://www.transparenttextures.com/patterns/carbon-fibre.png"},
+        "Classic Wood": {"bg": "#D7CCC8", "side": "#A1887F", "txt": "#3E2723", "img": "https://www.transparenttextures.com/patterns/wood-pattern.png"}
     }
     
-    p = palettes.get(theme_choice, palettes["Day Mode"])
-    # Hum dark blue ki jagah theme ka text color use karenge
-    main_text = p['text']
-    accent_color = p['accent']
-
+    p = palettes.get(theme_choice, palettes["Natural Linen (Sada)"])
+    
     st.markdown(f"""
     <style>
-        /* Main Background */
-        .stApp {{
-            background-color: {p['bg']};
-            background-image: url("{wallpaper_url if wallpaper_url else ""}");
-            background-attachment: fixed;
-        }}
-
-        /* --- SIDEBAR CLEAN LOOK (Blue Background Deleted) --- */
+        .stApp {{ background-color: {p['bg']}; background-image: url("{p['img']}"); }}
+        
+        /* SIDEBAR: DARK BLUE REMOVED - Set to Natural/Light */
         [data-testid="stSidebar"] {{
-            background-color: {p['sidebar']} !important;
-            border-right: 1px solid rgba(0,0,0,0.1);
-        }}
-
-        /* --- REMOVE "keyboard_double" & ADD ARROW ICON --- */
-        /* Ye code sidebar ke top header se faltu text hatayega aur arrow lagayega */
-        [data-testid="stSidebarNav"]::before {{
-            content: "◀ MENU"; /* Aap yahan ⬅ bhi laga sakte hain */
-            font-size: 20px;
-            font-weight: bold;
-            color: {accent_color};
-            display: block;
-            padding: 20px;
-            border-bottom: 1px solid rgba(0,0,0,0.1);
-        }}
-
-        /* Faltu text (keyboard_double) ko hide karne ke liye */
-        header[data-testid="stHeader"] {{
-            background-color: rgba(0,0,0,0) !important;
-        }}
-
-        /* Sidebar Text Colors */
-        [data-testid="stSidebarContent"] *, [data-testid="stSidebar"] p, [data-testid="stSidebar"] span {{
-            color: {main_text} !important;
-            font-weight: bold;
-        }}
-
-        /* Radio Buttons Menu Visibility */
-        div[data-testid="stSidebar"] .stRadio label {{
-            background-color: rgba(0, 0, 0, 0.03);
-            color: {main_text} !important;
-            padding: 8px 15px;
-            border-radius: 8px;
-            margin-bottom: 5px;
-            border-left: 3px solid transparent;
+            background-color: {p['side']} !important;
+            border-right: 2px solid #FFD700;
         }}
         
-        div[data-testid="stSidebar"] .stRadio label:hover {{
-            border-left: 3px solid {accent_color};
-            background-color: rgba(0, 0, 0, 0.05);
-        }}
-
-        /* Main Content Titles */
-        h1, h2, h3, label, .stMarkdown p {{
-            color: {main_text} !important;
+        /* Text Visibility */
+        h1, h2, h3, label, p, [data-testid="stSidebar"] * {{
+            color: {p['txt']} !important;
             font-weight: bold !important;
         }}
 
-        /* Buttons Styling */
+        /* VERTICAL BUTTONS FOR LOGIN (Custom Styling) */
         .stButton>button {{
-            background-color: {accent_color} !important;
-            color: #000 !important;
+            width: 100%;
             border-radius: 10px;
-            font-weight: bold;
-            border: none;
+            height: 50px;
+            background-color: #000080 !important;
+            color: white !important;
+            border: 2px solid #FFD700;
         }}
     </style>
     """, unsafe_allow_html=True)
-
-def apply_tailor_theme(choice):
-    apply_custom_ui(choice)

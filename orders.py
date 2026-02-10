@@ -2,123 +2,149 @@ import streamlit as st
 import json
 import uuid
 from datetime import date
-from database import get_connection, save_order_cloud
+from database import get_connection
 
 def add_order_ui():
-    shop = st.session_state.get("shop_name", "Tailor Master")
-    st.markdown(f"### 🧵 {shop} - Master Measurement Chart")
+    # CSS for making it look more like a professional form
+    st.markdown("""
+        <style>
+        .main-header { font-size: 24px; font-weight: bold; color: #3b8ed0; text-align: center; margin-bottom: 20px; }
+        .section-header { background-color: #f0f2f6; padding: 5px 15px; border-radius: 5px; margin: 15px 0; font-weight: bold; }
+        </style>
+    """, unsafe_allow_html=True)
 
-    # --- HEADER ---
-    c1, c2, c3,c4 = st.columns(4)
-    order_no = str(uuid.uuid4())[:6].upper()
-    cust_name = c1.text_input("Naam", placeholder="Customer Name")
-    phone = c2.text_input("Mobile Number")
-    order_date = c3.date_input("Order Date", date.today())
-    delivery = c4.date_input("Delivery Date", date.today())
+    st.markdown('<div class="main-header">🧵 TAILOR - Master Measurement Chart</div>', unsafe_allow_html=True)
 
-    st.markdown("---")
+    # ---------------- HEADER INFO ----------------
+    with st.container():
+        c1, c2, c3, c4 = st.columns([1.5, 1, 1, 1])
+        order_no = str(uuid.uuid4())[:6].upper()
+        order_date = c1.date_input("📅 Order Date", date.today())
+        delivery_date = c2.date_input("📦 Delivery Date", date.today())
+        suits_qty = c3.number_input("No. of Suits", 1, step=1)
+        order_id_display = c4.text_input("🆔 Order ID", value=f"AT-{order_no}", disabled=True)
 
-    # --- MEASUREMENTS (NAAP) ---
-    st.subheader("📏 Measurements (Naap)")
-    m1, m2, m3 = st.columns(3)
-    
-    meas = {}
-    with m1:
-        meas['len'] = st.text_input("Length (Lambai)")
-        meas['slv'] = st.text_input("Sleeves (Asteen)")
-        meas['shl'] = st.text_input("Shoulder (Teera)")
-        meas['col'] = st.text_input("Collar (Gala)")
-        meas['chest'] = st.text_input("Chest (Chaati)")
-        meas['l_chest'] = st.text_input("Lower Chest")
-    with m2:
-        meas['wst'] = st.text_input("Waist (Kamar)")
-        meas['hip'] = st.text_input("Hip")
-        meas['shl_len'] = st.text_input("Shalwar Length")
-        meas['shirt_len'] = st.text_input("Shirt Length")
-        meas['bottom'] = st.text_input("Bottom (Paincha)")
-        meas['pajama_len'] = st.text_input("Pajama Length")
-    with m3:
-        meas['paj_wst'] = st.text_input("Pajama Waist")
-        meas['paj_hip'] = st.text_input("Pajama Hip")
-        meas['thigh'] = st.text_input("Thigh (Raan)")
-        meas['paj_bot'] = st.text_input("Pajama Bottom")
-        meas['fly'] = st.text_input("Fly")
+    # ---------------- CUSTOMER DETAILS ----------------
+    st.markdown('<div class="section-header">👤 Customer Details</div>', unsafe_allow_html=True)
+    c1, c2 = st.columns(2)
+    with c1:
+        name = st.text_input("Customer Name (English)")
+        phone1 = st.text_input("Primary Mobile Number")
+    with c2:
+        name_urdu = st.text_input("Customer Name (Urdu / Sindhi)")
+        phone2 = st.text_input("Secondary Mobile / Address")
 
     st.markdown("---")
 
-    # --- STITCHING OPTIONS (SILAI) ---
-    st.subheader("🪡 Stitching Options (Hidayat)")
-    s1, s2, s3 = st.columns(3)
-    
-    styles = {}
-    with s1:
-        styles['sw_col'] = st.checkbox("Sherwani Collar")
-        styles['sh_col'] = st.checkbox("Shirt Collar")
-        styles['kur_slv'] = st.checkbox("Kurta Asteen")
-        styles['cuf'] = st.checkbox("Cuff Asteen")
-        styles['square'] = st.checkbox("Chakor Daman")
-        styles['round'] = st.checkbox("Gol Daman")
-    with s2:
-        styles['side_pocket'] = st.number_input("Side Pocket", 0, 2, 2)
-        styles['front_pocket'] = st.checkbox("Chest Pocket")
-        styles['shl_pocket'] = st.checkbox("Shalwar Pocket")
-        styles['paj_pocket'] = st.checkbox("Pajama Pocket")
-        styles['sada'] = st.checkbox("Sada Silai")
-        styles['gum'] = st.checkbox("Gum Silai")
-        styles['double'] = st.checkbox("Double Silai")
-    with s3:
-        styles['gher'] = st.checkbox("Shalwar Gher Wali")
-        styles['design'] = st.text_input("Design (Details)")
-        styles['design_no'] = st.text_input("Design Number")
-        fit = st.radio("Fitting", ["Loose", "Normal", "Smart Fit"], index=1)
-        styles['fitting'] = fit
+    # ---------------- MAIN LAYOUT: LEFT (NAAP) | RIGHT (STYLE) ----------------
+    left_col, right_col = st.columns([1, 1.2], gap="large")
+
+    # --- LEFT SIDE: MEASUREMENTS (NAAP) ---
+    with left_col:
+        st.subheader("📏 Measurements (Naap)")
+        m1, m2 = st.columns(2)
+        
+        # Labels mapping for database consistency
+        meas_labels = [
+            ("Length (Lambai)", "42 ½"), ("Sleeves (Asteen)", "25 ½"), 
+            ("Shoulder (Teera)", "20 ½"), ("Collar (Gala)", "17 ½"), 
+            ("Chest (Chaati)", "48"), ("Waist (Kamar)", "28"), 
+            ("Hip", "28"), ("Shalwar Length", "40"), 
+            ("Bottom (Paincha)", "20"), ("Shirt Length", "---")
+        ]
+        
+        measurements = {}
+        for i, (label, placeholder) in enumerate(meas_labels):
+            target_col = m1 if i < 5 else m2
+            measurements[label] = target_col.text_input(label, placeholder=placeholder)
+
+        # Extra Naaps
+        st.write("**Other Measurements**")
+        e1, e2 = st.columns(2)
+        measurements["Pajama Length"] = e1.text_input("Pajama Length")
+        measurements["Thigh (Raan)"] = e2.text_input("Thigh (Raan)")
+
+    # --- RIGHT SIDE: STITCHING OPTIONS (TICK/CROSS) ---
+    with right_col:
+        st.subheader("🪡 Stitching Options")
+        
+        styles = {}
+        
+        # Row 1: Collar
+        st.markdown("**Collar Type**")
+        sc1, sc2 = st.columns(2)
+        styles["shirt_collar"] = sc1.checkbox("Shirt Collar (Kakool)", value=True)
+        styles["sherwani_collar"] = sc2.checkbox("Sherwani Collar")
+
+        # Row 2: Sleeves
+        st.markdown("**Sleeve Type**")
+        sl1, sl2 = st.columns(2)
+        styles["cuff_astin"] = sl1.checkbox("Cuff Astin (✓)", value=True)
+        styles["kurta_astin"] = sl2.checkbox("Kurta Astin")
+
+        # Row 3: Daman
+        st.markdown("**Daman Type**")
+        dm1, dm2 = st.columns(2)
+        styles["gol_daman"] = dm1.checkbox("Gol Daman (✓)", value=True)
+        styles["chakor_daman"] = dm2.checkbox("Chakor Daman")
+
+        # Row 4: Pockets & Extras
+        st.markdown("**Pockets & Fitting**")
+        p1, p2 = st.columns(2)
+        styles["side_pocket_qty"] = p1.number_input("Side Pockets", 0, 5, value=2)
+        styles["front_pocket"] = p2.checkbox("Chest Pocket (✓)", value=True)
+        
+        f1, f2 = st.columns(2)
+        styles["shalwar_gher"] = f1.checkbox("Bara Gher (✓)", value=True)
+        styles["double_silai"] = f2.checkbox("Double Silai")
 
     st.markdown("---")
     
-    # --- BILLING ---
+    # ---------------- VERBAL & EXTRA ----------------
+    c_extra1, c_extra2 = st.columns(2)
+    with c_extra1:
+        verbal_instructions = st.text_area("🗣️ Verbal Instructions (Zubani Hidayat)", height=100, placeholder="Gahak ki khusoosi baat...")
+    with c_extra2:
+        extra_requirements = st.text_area("➕ Extra Requirements / Handwritten Notes", height=100, placeholder="Cuff: 6, Patti: 2.5x10.25...")
+
+    # ---------------- BILLING ----------------
+    st.markdown('<div class="section-header">💰 Billing Details</div>', unsafe_allow_html=True)
     b1, b2, b3 = st.columns(3)
-    total = b1.number_input("Total Bill", 0)
-    adv = b2.number_input("Advance Paid", 0)
-    rem = total - adv
-    b3.markdown(f"#### Balance: Rs. {rem}")
+    total_price = b1.number_input("Total Bill (Rs.)", 0)
+    advance_paid = b2.number_input("Advance (Rs.)", 0)
+    remaining_balance = total_price - advance_paid
+    b3.markdown(f"### Balance: {remaining_balance}")
 
-    if st.button("💾 SAVE ORDER", use_container_width=True, type="primary"):
-        if cust_name and phone:
-            order_data = {
-                "order_no": f"AT-{order_no}",
-                "order_date": str(date.today()),
-                "delivery_date": str(delivery),
-                "customer_name": cust_name,
-                "phone_1": phone,
-                "total_price": total,
-                "advance_paid": adv,
-                "remaining_balance": rem,
-                "measurements_json": json.dumps(meas),
-                "styles_json": json.dumps(styles)
-            }
-            
+    # ---------------- SAVE ACTION ----------------
+    st.markdown("<br>", unsafe_allow_html=True)
+    if st.button("💾 SAVE & SYNC ORDER", use_container_width=True, type="primary"):
+        if not name or not phone1:
+            st.error("⚠️ Customer Name aur Mobile Number lazmi hai!")
+        else:
             try:
-                # 1. Save Locally
                 conn = get_connection()
-                query = """INSERT INTO orders (order_no, order_date, delivery_date, customer_name, phone_1, 
-                           total_price, advance_paid, remaining_balance, measurements_json, styles_json) 
-                           VALUES (?,?,?,?,?,?,?,?,?,?)"""
-                conn.execute(query, (order_data['order_no'], order_data['order_date'], order_data['delivery_date'], 
-                                   order_data['customer_name'], order_data['phone_1'], total, adv, rem, 
-                                   order_data['measurements_json'], order_data['styles_json']))
+                conn.execute("""
+                    INSERT INTO orders (
+                        order_no, order_date, delivery_date,
+                        customer_name, customer_name_urdu,
+                        phone_1, phone_2, suit_qty, 
+                        total_price, advance_paid, remaining_balance,
+                        measurements_json, styles_json, verbal_instructions,
+                        is_synced
+                    )
+                    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,0)
+                """, (
+                    f"AT-{order_no}", str(order_date), str(delivery_date),
+                    name, name_urdu, phone1, phone2, suits_qty,
+                    total_price, advance_paid, remaining_balance,
+                    json.dumps(measurements),
+                    json.dumps(styles),
+                    f"{verbal_instructions} | Extra: {extra_requirements}"
+                ))
                 conn.commit()
                 conn.close()
                 
-                # 2. Sync to Cloud
-                success, msg = save_order_cloud(order_data)
-                if success: 
-                    st.success("Order Saved & Cloud Synced! ✅")
-                    st.balloons()
-                else: 
-                    st.warning(f"Saved Locally. Cloud Sync Pending (Check Keys).")
+                st.balloons()
+                st.success(f"✅ Order AT-{order_no} Saved Locally & Ready to Sync!")
             except Exception as e:
-                st.error(f"Database Error: {e}")
-        else:
-            st.error("Gahak ka naam aur phone number lazmi hai!")
-
-
+                st.error(f"❌ Database Error: {e}")
