@@ -13,7 +13,7 @@ def add_order_ui():
     order_no = str(uuid.uuid4())[:6].upper()
     cust_name = c1.text_input("Naam", placeholder="Customer Name")
     phone = c2.text_input("Mobile Number")
-    order = c3.date_input("Order Date", date.today())
+    order_date = c3.date_input("Order Date", date.today())
     delivery = c4.date_input("Delivery Date", date.today())
 
     st.markdown("---")
@@ -120,4 +120,5 @@ def add_order_ui():
                 st.error(f"Database Error: {e}")
         else:
             st.error("Gahak ka naam aur phone number lazmi hai!")
+
 
