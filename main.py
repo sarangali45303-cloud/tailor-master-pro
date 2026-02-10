@@ -16,28 +16,29 @@ init_db()
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
 
-# 4. Multi-Language Selection
-lang = st.sidebar.selectbox("🌐 Language / زبان", ["English", "Roman Urdu", "Sindhi"])
+# 4. Sidebar Themes & Language
+st.sidebar.markdown("### ⚙️ Settings")
+lang = st.sidebar.selectbox("🌐 Language", ["English", "Roman Urdu", "Sindhi"])
 T = get_text(lang)
 
-# 5. Stealth Master Access (?p=admin786)
-query_params = st.query_params
-is_master_mode = query_params.get("p") == "admin786"
-
-# 6. Theme Selection
 theme_choice = st.sidebar.selectbox("🎨 Style", ["Day Mode", "Night Mode", "Golden Pro"])
 apply_custom_ui(theme_choice)
 
-# 7. App Logic
+# 5. Stealth Master Mode (?p=admin786)
+is_master_mode = st.query_params.get("p") == "admin786"
+
+# 6. App Logic
 if not st.session_state.logged_in:
     login_system()
 else:
+    # Header with Shop Name
     shop = st.session_state.get("shop_name", "Tailor Master")
-    st.sidebar.markdown(f"### 🧵 {shop}")
+    st.sidebar.markdown(f"<h2 style='color:#FFD700; text-align:center;'>🧵 {shop}</h2>", unsafe_allow_html=True)
+    
     user_profile_ui()
 
-    st.sidebar.markdown(f"#### 📌 Menu")
-    menu = st.sidebar.radio("Navigate", ["📊 Dashboard", "🧵 New Order", "📦 All Orders", "💰 Accounts"])
+    st.sidebar.markdown("---")
+    menu = st.sidebar.radio(T.get("dash", "Menu"), ["📊 Dashboard", "🧵 New Order", "📦 All Orders", "💰 Accounts"])
 
     if menu == "📊 Dashboard":
         show_dashboard_stats()
@@ -48,28 +49,31 @@ else:
     elif menu == "💰 Accounts":
         show_accounts_summary()
 
-    # --- STEALTH MASTER PANEL ---
+    # --- STEALTH MASTER PANEL (Only for SuperAdmin) ---
     if is_master_mode:
         st.sidebar.markdown("---")
         st.sidebar.error("🔐 MASTER ADMIN PANEL")
         
-        # FIX FOR ORDER_DATE ERROR
-        if st.sidebar.button("🛠️ Fix Database (Fix Order Date Error)"):
-            reset_db()
-            st.sidebar.success("Database Fixed! Restarting...")
-            st.rerun()
-
-        master_op = st.sidebar.selectbox("Master Control", ["View All Shops", "System Status"])
+        master_op = st.sidebar.selectbox("Admin Controls", ["System Repair", "View All Shops"])
         
-        if master_op == "View All Shops":
+        if master_op == "System Repair":
+            st.warning("⚠️ Repair karne se local data delete ho sakta hai.")
+            if st.button("🛠️ Full Database Fix"):
+                reset_db()
+                st.rerun()
+        
+        elif master_op == "View All Shops":
             st.subheader("👥 Registered Shop Owners (Cloud)")
             from database import supabase
             try:
                 res = supabase.table("users").select("username, shop_name, role").execute()
-                st.table(res.data)
-            except:
-                st.info("No shops found or API Key error.")
+                if res.data:
+                    st.table(res.data)
+                else:
+                    st.info("No shops registered on Cloud yet.")
+            except Exception as e:
+                st.error(f"Cloud API Error: {e}")
 
-# Footer
+# 7. Sidebar Footer
 st.sidebar.markdown("---")
 st.sidebar.caption("Tailor Master Pro v1.0 | Powered by Supabase Cloud")
