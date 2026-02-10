@@ -11,7 +11,7 @@ def add_order_ui():
     # --- HEADER ---
     c1, c2, c3 = st.columns(3)
     order_no = str(uuid.uuid4())[:6].upper()
-    cust_name = c1.text_input("Gahak ka Naam", placeholder="Name")
+    cust_name = c1.text_input("Naam", placeholder="Name")
     phone = c2.text_input("Mobile Number")
     delivery = c3.date_input("Delivery Date", date.today())
 
@@ -108,3 +108,4 @@ def add_order_ui():
             else: st.warning(f"Saved Locally. Cloud Sync Pending (Check Keys).")
         else:
             st.error("Gahak ka naam aur phone lazmi hai!")
+
