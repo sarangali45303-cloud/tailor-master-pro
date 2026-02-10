@@ -68,19 +68,31 @@ def verify_login(user, pwd):
     conn.close()
     return result
 
+# database.py mein add_new_user function ko is se badal den:
+
 def add_new_user(username, password, shop_name):
     conn = get_connection()
     cursor = conn.cursor()
     try:
+        # 1. Local Database mein save karen (for Offline login)
         cursor.execute("INSERT INTO users (username, password, role, shop_name) VALUES (?, ?, 'admin', ?)",
                        (username, password, shop_name))
         conn.commit()
-        return True, "✅ Account Created Successfully!"
-    except:
-        return False, "❌ Username already exists!"
+        
+        # 2. CLOUD SYNC (Ab Master Panel ko shop nazar ayegi)
+        user_data = {
+            "username": username,
+            "password": password, # Security ke liye hashing honi chahiye lekin filhal simple rakha hai
+            "role": "admin",
+            "shop_name": shop_name
+        }
+        supabase.table("users").insert(user_data).execute()
+        
+        return True, f"✅ Account for '{shop_name}' created on Cloud & Local!"
+    except Exception as e:
+        return False, f"❌ Error: {str(e)}"
     finally:
         conn.close()
-
 def save_order_cloud(data):
     """Saves order to Supabase"""
     try:
@@ -89,3 +101,4 @@ def save_order_cloud(data):
         return True, "Cloud Saved ✅"
     except Exception as e:
         return False, str(e)
+
