@@ -1,4 +1,11 @@
-def get_translation(lang):
+def get_text(lang):
+    translations = {
+        "English": {"title": "Main Menu", "new_order": "New Order", "save": "Save"},
+        "Roman Urdu": {"title": "Asli Menu", "new_order": "Naya Order", "save": "Save Karein"},
+        "Sindhi": {"title": "مين مينيو", "new_order": "نئون آرڊر", "save": "محفوظ ڪريو"}
+    }
+    return translations.get(lang, translations["English"])
+    def get_translation(lang):
     translations = {
         "English": {
             "welcome": "Welcome", "new_order": "New Order", "cust_name": "Customer Name",
@@ -59,4 +66,5 @@ def get_text(lang):
             "offline": "انٽرنيٽ ناهي (لوڪل ڪم جاري آهي)"
         }
     }
+
     return translations.get(lang, translations["English"])
