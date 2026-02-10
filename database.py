@@ -5,7 +5,7 @@ from supabase import create_client
 # --- 1. CLOUD SETTINGS (Supabase) ---
 # ⚠️ 401 Error hal karne ke liye URL aur KEY ko dubara copy-paste karen bina kisi space ke.
 URL = "https://maadjojvbpewengqojpp.supabase.co" 
-KEY = "sb_publishable_clmdaKO87QAnyOP0Irny0g_jeFwkLYt" 
+KEY = "sb_publishable_clmdaKO87QAnyOP0IrnY0g_jEfwkLYt" 
 
 try:
     supabase = create_client(URL, KEY)
@@ -89,3 +89,4 @@ def save_order_cloud(data):
         return True, "Cloud Saved ✅"
     except Exception as e:
         return False, str(e)
+
