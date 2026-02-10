@@ -11,7 +11,7 @@ def add_order_ui():
     # --- HEADER ---
     c1, c2, c3 = st.columns(3)
     order_no = str(uuid.uuid4())[:6].upper()
-    cust_name = c1.text_input("Naam", placeholder="Name")
+    cust_name = c1.text_input("Gahak ka Naam", placeholder="Customer Name")
     phone = c2.text_input("Mobile Number")
     delivery = c3.date_input("Delivery Date", date.today())
 
@@ -23,24 +23,24 @@ def add_order_ui():
     
     meas = {}
     with m1:
-        meas['length'] = st.text_input("Length (Lambai)")
-        meas['sleeves'] = st.text_input("Sleeves (Asteen)")
-        meas['shoulder'] = st.text_input("Shoulder (Teera)")
-        meas['collar'] = st.text_input("Collar (Gala)")
+        meas['len'] = st.text_input("Length (Lambai)")
+        meas['slv'] = st.text_input("Sleeves (Asteen)")
+        meas['shl'] = st.text_input("Shoulder (Teera)")
+        meas['col'] = st.text_input("Collar (Gala)")
         meas['chest'] = st.text_input("Chest (Chaati)")
-        meas['lower_chest'] = st.text_input("Lower Chest")
+        meas['l_chest'] = st.text_input("Lower Chest")
     with m2:
-        meas['waist'] = st.text_input("Waist (Kamar)")
+        meas['wst'] = st.text_input("Waist (Kamar)")
         meas['hip'] = st.text_input("Hip")
-        meas['shalwar_len'] = st.text_input("Shalwar Length")
+        meas['shl_len'] = st.text_input("Shalwar Length")
         meas['shirt_len'] = st.text_input("Shirt Length")
         meas['bottom'] = st.text_input("Bottom (Paincha)")
         meas['pajama_len'] = st.text_input("Pajama Length")
     with m3:
-        meas['waist_2'] = st.text_input("Waist-II (Pajama)")
-        meas['hip_2'] = st.text_input("Hip-II")
+        meas['paj_wst'] = st.text_input("Pajama Waist")
+        meas['paj_hip'] = st.text_input("Pajama Hip")
         meas['thigh'] = st.text_input("Thigh (Raan)")
-        meas['bottom_2'] = st.text_input("Bottom-II")
+        meas['paj_bot'] = st.text_input("Pajama Bottom")
         meas['fly'] = st.text_input("Fly")
 
     st.markdown("---")
@@ -51,25 +51,25 @@ def add_order_ui():
     
     styles = {}
     with s1:
-        styles['sherwani_collar'] = st.checkbox("Sherwani Collar")
-        styles['shirt_collar'] = st.checkbox("Shirt Collar")
-        styles['kurta_astin'] = st.checkbox("Kurta Asteen")
-        styles['cuff_astin'] = st.checkbox("Cuff Asteen")
-        styles['chakor_daman'] = st.checkbox("Chakor Daman")
-        styles['gol_daman'] = st.checkbox("Gol Daman")
+        styles['sw_col'] = st.checkbox("Sherwani Collar")
+        styles['sh_col'] = st.checkbox("Shirt Collar")
+        styles['kur_slv'] = st.checkbox("Kurta Asteen")
+        styles['cuf'] = st.checkbox("Cuff Asteen")
+        styles['square'] = st.checkbox("Chakor Daman")
+        styles['round'] = st.checkbox("Gol Daman")
     with s2:
         styles['side_pocket'] = st.number_input("Side Pocket", 0, 2, 2)
         styles['front_pocket'] = st.checkbox("Chest Pocket")
-        styles['shalwar_pocket'] = st.checkbox("Shalwar Pocket")
-        styles['pajama_pocket'] = st.checkbox("Pajama Pocket")
-        styles['sada_silai'] = st.checkbox("Sada Silai")
-        styles['gum_silai'] = st.checkbox("Gum Silai")
-        styles['double_silai'] = st.checkbox("Double Silai")
+        styles['shl_pocket'] = st.checkbox("Shalwar Pocket")
+        styles['paj_pocket'] = st.checkbox("Pajama Pocket")
+        styles['sada'] = st.checkbox("Sada Silai")
+        styles['gum'] = st.checkbox("Gum Silai")
+        styles['double'] = st.checkbox("Double Silai")
     with s3:
-        styles['gher_wali'] = st.checkbox("Shalwar Gher Wali")
+        styles['gher'] = st.checkbox("Shalwar Gher Wali")
         styles['design'] = st.text_input("Design (Details)")
         styles['design_no'] = st.text_input("Design Number")
-        fit = st.radio("Fitting", ["Loose", "Normal", "Smart Fit"])
+        fit = st.radio("Fitting", ["Loose", "Normal", "Smart Fit"], index=1)
         styles['fitting'] = fit
 
     st.markdown("---")
@@ -81,7 +81,7 @@ def add_order_ui():
     rem = total - adv
     b3.markdown(f"#### Balance: Rs. {rem}")
 
-    if st.button("💾 SAVE ORDER"):
+    if st.button("💾 SAVE ORDER", use_container_width=True, type="primary"):
         if cust_name and phone:
             order_data = {
                 "order_no": f"AT-{order_no}",
@@ -95,17 +95,27 @@ def add_order_ui():
                 "measurements_json": json.dumps(meas),
                 "styles_json": json.dumps(styles)
             }
-            # Save Locally
-            conn = get_connection()
-            conn.execute("INSERT INTO orders (order_no, order_date, delivery_date, customer_name, phone_1, total_price, advance_paid, remaining_balance, measurements_json, styles_json) VALUES (?,?,?,?,?,?,?,?,?,?)",
-                         (order_data['order_no'], order_data['order_date'], order_data['delivery_date'], order_data['customer_name'], order_data['phone_1'], total, adv, rem, order_data['measurements_json'], order_data['styles_json']))
-            conn.commit()
-            conn.close()
             
-            # Sync to Cloud
-            success, msg = save_order_cloud(order_data)
-            if success: st.success("Order Saved & Synced! ✅")
-            else: st.warning(f"Saved Locally. Cloud Sync Pending (Check Keys).")
+            try:
+                # 1. Save Locally
+                conn = get_connection()
+                query = """INSERT INTO orders (order_no, order_date, delivery_date, customer_name, phone_1, 
+                           total_price, advance_paid, remaining_balance, measurements_json, styles_json) 
+                           VALUES (?,?,?,?,?,?,?,?,?,?)"""
+                conn.execute(query, (order_data['order_no'], order_data['order_date'], order_data['delivery_date'], 
+                                   order_data['customer_name'], order_data['phone_1'], total, adv, rem, 
+                                   order_data['measurements_json'], order_data['styles_json']))
+                conn.commit()
+                conn.close()
+                
+                # 2. Sync to Cloud
+                success, msg = save_order_cloud(order_data)
+                if success: 
+                    st.success("Order Saved & Cloud Synced! ✅")
+                    st.balloons()
+                else: 
+                    st.warning(f"Saved Locally. Cloud Sync Pending (Check Keys).")
+            except Exception as e:
+                st.error(f"Database Error: {e}")
         else:
-            st.error("Gahak ka naam aur phone lazmi hai!")
-
+            st.error("Gahak ka naam aur phone number lazmi hai!")
