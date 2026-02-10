@@ -9,11 +9,12 @@ def add_order_ui():
     st.markdown(f"### 🧵 {shop} - Master Measurement Chart")
 
     # --- HEADER ---
-    c1, c2, c3 = st.columns(3)
+    c1, c2, c3,c4 = st.columns(4)
     order_no = str(uuid.uuid4())[:6].upper()
-    cust_name = c1.text_input("Gahak ka Naam", placeholder="Customer Name")
+    cust_name = c1.text_input("Naam", placeholder="Customer Name")
     phone = c2.text_input("Mobile Number")
-    delivery = c3.date_input("Delivery Date", date.today())
+    order = c3.date_input("Order Date", date.today())
+    delivery = c4.date_input("Delivery Date", date.today())
 
     st.markdown("---")
 
@@ -119,3 +120,4 @@ def add_order_ui():
                 st.error(f"Database Error: {e}")
         else:
             st.error("Gahak ka naam aur phone number lazmi hai!")
+
