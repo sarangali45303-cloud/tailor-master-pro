@@ -10,24 +10,27 @@ def login_system():
     if not st.session_state.logged_in:
         st.markdown("<h2 style='text-align: center; color: #000080;'>🔐 TAILOR MASTER PRO v5.0</h2>", unsafe_allow_html=True)
         
-        # Vertical Menu for Mobile
+        # Vertical Menu
         option = st.radio("CHOOSE ACTION:", ["🔑 Login to Shop", "🆕 Register New Shop", "🆘 Account Recovery"])
         st.markdown("---")
 
-        if option == "🆕 Register New Shop":
+        # --- LOGIN LOGIC ---
+        if option == "🔑 Login to Shop":
             u = st.text_input("Username")
             p = st.text_input("Password", type="password")
             if st.button("LOGIN NOW", use_container_width=True):
                 user_data = verify_login(u, p)
                 if user_data:
                     st.session_state.logged_in = True
+                    # Maan lete hain user_data returns: (role, shop_name)
                     st.session_state.user_role = user_data[0]
                     st.session_state.shop_name = user_data[1]
                     st.session_state.username = u
                     st.rerun()
                 else:
-                    st.error("Invalid Credentials")
+                    st.error("Invalid Username or Password")
 
+        # --- REGISTRATION LOGIC ---
         elif option == "🆕 Register New Shop":
             new_u = st.text_input("Choose Username")
             new_p = st.text_input("Choose Password", type="password")
@@ -37,7 +40,6 @@ def login_system():
                 if new_u and new_p and new_s:
                     success, msg = add_new_user(new_u, new_p, new_s)
                     if success:
-                        # --- AUTO LOGIN ---
                         st.session_state.logged_in = True
                         st.session_state.username = new_u
                         st.session_state.shop_name = new_s
@@ -62,8 +64,8 @@ def user_profile_ui():
 
     # Display Owner Pic & Info
     st.sidebar.image(st.session_state.profile_pic, width=100)
-    st.sidebar.write(f"🏪 **{st.session_state.shop_name}**")
-    st.sidebar.write(f"👤 Master: {st.session_state.username}")
+    st.sidebar.write(f"🏪 **{st.session_state.get('shop_name', 'Shop')}**")
+    st.sidebar.write(f"👤 Master: {st.session_state.get('username', 'User')}")
 
     # Edit Profile Section
     with st.sidebar.expander("⚙️ Edit Profile"):
@@ -75,15 +77,20 @@ def user_profile_ui():
             
         uploaded_file = st.file_uploader("Upload Owner Photo", type=["jpg", "png"])
         if uploaded_file:
+            # File ko read karke image display karwana
             st.session_state.profile_pic = uploaded_file
-            st.success("Photo Updated!")
+            st.success("Photo Updated! Refreshing...")
+            st.rerun()
 
     if st.sidebar.button("🚪 Logout", use_container_width=True):
-        st.session_state.logged_in = False
-
+        # Saara session clear karne ke liye
+        for key in list(st.session_state.keys()):
+            del st.session_state[key]
         st.rerun()
 
-
-
-
-
+# Main App Logic
+login_system()
+if st.session_state.logged_in:
+    user_profile_ui()
+    st.write(f"# Welcome to {st.session_state.shop_name} Dashboard")
+    # Aapka baaki ka app yahan aayega
