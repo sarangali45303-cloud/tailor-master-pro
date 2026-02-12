@@ -28,7 +28,7 @@ def login_system():
                 else:
                     st.error("Invalid Credentials")
 
-        elif option == "Register New Shop":
+        elif option == "🆕 Register New Shop":
             new_u = st.text_input("Choose Username")
             new_p = st.text_input("Choose Password", type="password")
             new_s = st.text_input("Your Shop Name (e.g. Ali Tailors)")
@@ -82,6 +82,7 @@ def user_profile_ui():
         st.session_state.logged_in = False
 
         st.rerun()
+
 
 
 
