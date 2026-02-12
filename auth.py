@@ -14,7 +14,7 @@ def login_system():
         option = st.radio("CHOOSE ACTION:", ["🔑 Login to Shop", "🆕 Register New Shop", "🆘 Account Recovery"])
         st.markdown("---")
 
-        if option == "🆕Register New Shop":
+        if option == "🆕 Register New Shop":
             u = st.text_input("Username")
             p = st.text_input("Password", type="password")
             if st.button("LOGIN NOW", use_container_width=True):
@@ -82,5 +82,6 @@ def user_profile_ui():
         st.session_state.logged_in = False
 
         st.rerun()
+
 
 
